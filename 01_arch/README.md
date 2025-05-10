@@ -65,7 +65,7 @@
 </details>
 
 ### Решение задания
-
+<details> <summary>Ранее сделанное решение</summary>
 В качестве решения пришлите в формате ниже ответы на вопросы:
 1. Каким образом проходит путь запросов от клиента: на какой сервис и через какие сервисы?
 ```
@@ -223,6 +223,121 @@ Content-Type: application/json
 Сервисы 9002 и 9003 добавляют статистику по категориям (categoryStats), а 9004 — нет.
 
 Для аутентификации используется JWT (порт 9001), а для запросов — либо этот токен, либо заголовок X-Userid.
+</details>
+
+Исправленное решение
+
+Путь запросов от клиента проходит через следующие сервисы и порты:
+
+1. Клиент ↔ Сервер 1 (порт 9001)
+  Клиент отправляет запрос на порт 9001 (исходящий порт клиента: 40564).
+  Сервер 1 отвечает на порт 40564.
+
+2. Клиент ↔ Сервер 2 (порт 9002)
+  Клиент отправляет запрос на порт 9002 (исходящий порт клиента: 42734).
+  Сервер 2 отвечает на порт 42734.
+
+3. Межсерверные взаимодействия:
+
+Сервер 2 ↔ Сервер 3 (порт 9003)
+  Сервер 2 отправляет запрос на порт 9003 (исходящий порт: 37198).
+  Сервер 3 отвечает на порт 37198.
+
+Сервер 2 ↔ Сервер 4 (порт 9004)
+  Сервер 2 отправляет запрос на порт 9004 (исходящий порт: 53304).
+  Сервер 4 отвечает на порт 53304.
+
+
+2. Какие запросы делаются на каждом этапе, и какие ответы на них приходят?
+
+ Клиент → Сервер 1 (порт 9001):
+Исходящий порт клиента: 40564
+
+Запрос:
+```
+PUT /users HTTP/1.1  
+Content-Type: application/x-www-form-urlencoded  
+Тело: login=user&password=111111  
+```
+Ответ:
+
+```
+HTTP/1.1 200 OK  
+Content-Type: application/json  
+{"token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImxvZ2luIjoidXNlciIsInJvbGVzIjpbIlVTRVIiXSwiaWF0IjoxNzQ2OTA3MDcwLCJleHAiOjE3NDY5MTA2NzB9.gXRYLuiWqvBB2eQi2xbndd8VKsqGIVRSjFSRdxw3guBEgw0cr-TR1iQ_SYfJG0twaDf..."}
+```
+
+Клиент → Сервер 2 (порт 9002):
+Исходящий порт клиента: 42734
+
+Запрос:
+```
+GET /api/transactions HTTP/1.1  
+Authorization: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImxvZ2luIjoidXNlciIsInJvbGVzIjpbIlVTRVIiXSwiaWF0IjoxNzQ2OTA3MDcwLCJleHAiOjE3NDY5MTA2NzB9.gXRYLuiWqvBB2eQi2xbndd8VKsqGIVRSjFSRdxw3guBEgw0cr-TR1iQ_SYfJG0twaDf...
+```
+
+Ответ:
+```
+HTTP/1.1 200 OK  
+Content-Type: application/json  
+{
+  "transactions": [
+    {"id": 1, "userId": 2, "category": "auto", "amount": 1000000, "created": 1746907056},
+    {"id": 2, "userId": 2, "category": "auto", "amount": 100000, "created": 1746907056},
+    {"id": 3, "userId": 2, "category": "food", "amount": 100000, "created": 1746907056}
+  ],
+  "categoryStats": {"auto": 1100000, "food": 100000}
+}
+```
+
+Сервер 2 → Сервер 3 (порт 9003):
+Исходящий порт Сервера 2: 37198
+
+Запрос:
+```
+GET /api/transactions HTTP/1.1  
+X-Userid: 2
+```
+Ответ:
+
+```
+HTTP/1.1 200 OK  
+Content-Type: application/json  
+{
+  "transactions": [
+    {"id": 1, "userId": 2, "category": "auto", "amount": 1000000, "created": 1746907056},
+    {"id": 2, "userId": 2, "category": "auto", "amount": 100000, "created": 1746907056},
+    {"id": 3, "userId": 2, "category": "food", "amount": 100000, "created": 1746907056}
+  ],
+  "categoryStats": {"auto": 1100000, "food": 100000}
+}
+```
+
+Сервер 2 → Сервер 4 (порт 9004):
+Исходящий порт Сервера 2: 53304
+
+Запрос:
+
+```
+GET /api/transactions HTTP/1.1  
+X-Userid: 2
+```
+
+Ответ:
+
+```
+HTTP/1.1 200 OK  
+Content-Type: application/json  
+[
+  {"id": 1, "userId": 2, "category": "auto", "amount": 1000000, "created": 1746907056},
+  {"id": 2, "userId": 2, "category": "auto", "amount": 100000, "created": 1746907056},
+  {"id": 3, "userId": 2, "category": "food", "amount": 100000, "created": 1746907056}
+]
+```
+
+
+
+
 
 
 <details> <summary>Нажмите, чтобы развернуть/свернуть</summary>
