@@ -65,7 +65,165 @@
 
 В качестве решения пришлите в формате ниже ответы на вопросы:
 1. Каким образом проходит путь запросов от клиента: на какой сервис и через какие сервисы?
+```
+Client → Server1 (9001) → Server2 (9002) → Server3 (9003) → Server4 (9004)
+```
+
+
 2. Какие запросы делаются на каждом этапе, и какие ответы на них приходят?
+
+1. Client --> Server 1 (запрос аутентификации):
+```
+PUT http://localhost:9001/users  
+Content-Type: application/x-www-form-urlencoded  
+
+login=user&password=111111  
+```
+
+2. Server 1 --> Client (ответ с токеном):
+```
+200 OK  
+Content-Type: application/json  
+
+{  
+  "token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImxvZ2luIjoidXNlciIsInJvbGVzIjpbIlVTRVIiXSwiaWF0IjoxNzQ2ODc0MzAxLCJleHAiOjE3NDY4Nzc5MDF9.fcbNOlPVC4GwysrqOcCHboGsT4xCd7L5a9KHCkPwXRsKd_3ysH6L6O2X1n4tUsyqgD..."  
+}  
+
+```
+
+3. Client --> Server 2 (запрос транзакций с JWT):
+```
+GET http://localhost:9002/api/transactions  
+Authorization: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImxvZ2luIjoidXNlciIsInJvbGVzIjpbIlVTRVIiXSwiaWF0IjoxNzQ2ODc0MzAxLCJleHAiOjE3NDY4Nzc5MDF9.fcbNOlPVC4GwysrqOcCHboGsT4xCd7L5a9KHCkPwXRsKd_3ysH6L6O2X1n4tUsyqgD...  
+
+```
+
+4. Server 2 --> Client (ответ с транзакциями и статистикой):
+```
+200 OK  
+Content-Type: application/json  
+
+{  
+  "transactions": [  
+    {  
+      "id": 1,  
+      "userId": 2,  
+      "category": "auto",  
+      "amount": 1000000,  
+      "created": 1746874144  
+    },  
+    {  
+      "id": 2,  
+      "userId": 2,  
+      "category": "auto",  
+      "amount": 100000,  
+      "created": 1746874144  
+    },  
+    {  
+      "id": 3,  
+      "userId": 2,  
+      "category": "food",  
+      "amount": 100000,  
+      "created": 1746874144  
+    }  
+  ],  
+  "categoryStats": {  
+    "auto": 1100000,  
+    "food": 100000  
+  }  
+}  
+```
+
+5. Client --> Server 3 (запрос транзакций с X-Userid):
+
+```
+GET http://localhost:9003/api/transactions  
+X-Userid: 2  
+```
+
+6. Server 3 --> Client (ответ с транзакциями и статистикой):
+```
+200 OK  
+Content-Type: application/json  
+
+{  
+  "transactions": [  
+    {  
+      "id": 1,  
+      "userId": 2,  
+      "category": "auto",  
+      "amount": 1000000,  
+      "created": 1746874144  
+    },  
+    {  
+      "id": 2,  
+      "userId": 2,  
+      "category": "auto",  
+      "amount": 100000,  
+      "created": 1746874144  
+    },  
+    {  
+      "id": 3,  
+      "userId": 2,  
+      "category": "food",  
+      "amount": 100000,  
+      "created": 1746874144  
+    }  
+  ],  
+  "categoryStats": {  
+    "auto": 1100000,  
+    "food": 100000  
+  }  
+}  
+```
+7. Client --> Server 4 (запрос транзакций с X-Userid):
+
+```
+GET http://localhost:9004/api/transactions  
+X-Userid: 2  
+```
+
+8. Server 4 --> Client (ответ только с транзакциями, без статистики):
+
+```
+200 OK  
+Content-Type: application/json  
+
+[  
+  {  
+    "id": 1,  
+    "userId": 2,  
+    "category": "auto",  
+    "amount": 1000000,  
+    "created": 1746874144  
+  },  
+  {  
+    "id": 2,  
+    "userId": 2,  
+    "category": "auto",  
+    "amount": 100000,  
+    "created": 1746874144  
+  },  
+  {  
+    "id": 3,  
+    "userId": 2,  
+    "category": "food",  
+    "amount": 100000,  
+    "created": 1746874144  
+  }  
+]  
+```
+
+
+Все сервисы (9002, 9003, 9004) возвращают одни и те же транзакции, но в разном формате.
+
+Сервисы 9002 и 9003 добавляют статистику по категориям (categoryStats), а 9004 — нет.
+
+Для аутентификации используется JWT (порт 9001), а для запросов — либо этот токен, либо заголовок X-Userid.
+
+
+
+
 
 ### Формат ответа
 
