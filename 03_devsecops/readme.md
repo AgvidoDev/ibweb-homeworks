@@ -29,6 +29,8 @@
 В тестовом виде запустили [свой GitLab по адресу](http://213.226.126.48). Открыта регистрация. Нужен апрув от администратора - niyazkashapovexpertib в discord.
 Остальные шаги те же что и ниже. Так же нужен свой раннер и настроить свой проект под свои нужды.
 
+<details>
+  <summary> Задание .</summary>
 
 ### Этапы выполнения
 
@@ -36,8 +38,6 @@
 
 Для регистрации вам будет доступно 2 варианта.
 
-<details>
-  <summary> Вариант 1. Если у вас есть аккаунт GitHub или Google.</summary>
 
 Выберите один из вариантов: GitHub или Google.
 
@@ -53,10 +53,7 @@
 
 -----
   
-</details>
 
-<details>
-  <summary> Вариант 2. Если у вас нет аккаунта GitHub или Google, зарегистрируйте свой аккаунт на email.</summary>
 
 В окне укажите действующую почту:
 
@@ -68,7 +65,7 @@
 
 -----
   
-</details>
+
 
 2\. Проверьте свой `email`, указанный при регистрации, и подтвердите регистрацию.
 
@@ -170,15 +167,28 @@
 - Dependency List;
 - License Compliance.
 
+
+</details>
+
 ### Ответьте на вопросы:
 
 **Важно**: после окончания проверки подождите пару минут и несколько раз обновите страницу через `Shift` + `F5`. Иногда не все данные по проверкам подтягиваются сразу. Убедитесь, что уязвимости точно найдены для приложения, зависимостей и контейнера.
 
+
+
 **Вопросы для домашнего задания** 
 
 1\. Сколько уязвимостей и какого уровня значимости найдено (Severity)?
+![SCREEN](./03web.jpg)
 
-![vulnerabilities](https://github.com/netology-code/ibweb-homeworks/assets/138114803/260031a1-4260-4f56-b743-0ffc5f4cb89e)
+```
+Уровень	Количество	Примеры уязвимостей
+Critical	8	SQL Injection (3), execa@1.0.0, minimist@0.0.8, json-schema@0.2.3, tough-cookie@2.5.0, fsevents@1.2.9 (CVE-2023-45311 и Malware)
+High	27	ReDoS (redis, tar, minimatch), Prototype Pollution (async, nconf, ini), Path Traversal (tar), XSS (koa), Arbitrary Code Execution (babel)
+Medium	23	ReDoS (urijs, micromatch, decode-uri-component), Open Redirect (urijs), SSRF (request), Session Fixation (passport)
+Unknown	4	koa (без CVE), fsevents (Malware), braces (2 записи без severity)
+```
+
 
 2\. Сколько из них:
 - в самом приложении (SAST);
