@@ -178,27 +178,90 @@
 
 **Вопросы для домашнего задания** 
 
+В ходе сканирования была выдана ошибка:
+```
+10030131567: container_scanning
+
+Uploading artifacts for failed job
+Uploading artifacts...
+WARNING: **/gl-sbom-*.cdx.json: no matching files. Ensure that the artifact path is relative to the working directory (/builds/agvidod/ib-devsecops-app) 
+ERROR: No files to upload                          
+Uploading artifacts...
+WARNING: gl-container-scanning-report.json: no matching files. Ensure that the artifact path is relative to the working directory (/builds/agvidod/ib-devsecops-app) 
+ERROR: No files to upload                          
+Cleaning up project directory and file based variables
+ERROR: Job failed: exit code 1
+```
+
+Так же отсутствовал файл в git
+```
+template: Security/License-Scanning.gitlab-ci.yml
+```
+
+
+
 1\. Сколько уязвимостей и какого уровня значимости найдено (Severity)?
 ![SCREEN](./03web.jpg)
 
 ```
 Уровень	Количество	Примеры уязвимостей
-Critical	8	SQL Injection (3), execa@1.0.0, minimist@0.0.8, json-schema@0.2.3, tough-cookie@2.5.0, fsevents@1.2.9 (CVE-2023-45311 и Malware)
-High	27	ReDoS (redis, tar, minimatch), Prototype Pollution (async, nconf, ini), Path Traversal (tar), XSS (koa), Arbitrary Code Execution (babel)
-Medium	23	ReDoS (urijs, micromatch, decode-uri-component), Open Redirect (urijs), SSRF (request), Session Fixation (passport)
-Unknown	4	koa (без CVE), fsevents (Malware), braces (2 записи без severity)
+Critical    8    SQL Injection (3), execa@1.0.0, minimist@0.0.8, json-schema@0.2.3, tough-cookie@2.5.0, fsevents@1.2.9 (CVE-2023-45311 и Malware)
+High       27    ReDoS (redis, tar, minimatch), Prototype Pollution (async, nconf, ini), Path Traversal (tar), XSS (koa), Arbitrary Code Execution (babel)
+Medium     23    ReDoS (urijs, micromatch, decode-uri-component), Open Redirect (urijs), SSRF (request), Session Fixation (passport)
+Unknown     4    koa (без CVE), fsevents (Malware), braces (2 записи без severity)
 ```
 
 
 2\. Сколько из них:
 - в самом приложении (SAST);
+```
+3 критических (Critical) уязвимости типа SQL Injection в файле app/server.js
+```
 - в контейнерах (Container Scanning);
 - в зависимостях (Dependency Scanning);
+```
+Critical: 5
+execa@1.0.0 (Uncontrolled Search Path Element)
+minimist@0.0.8 (Prototype Pollution, CVE-2021-44906)
+json-schema@0.2.3 (Prototype Pollution, CVE-2021-3918)
+tough-cookie@2.5.0 (Prototype Pollution, CVE-2023-26136)
+fsevents@1.2.9 (OS Command Injection, CVE-2023-45311)
+
+High: 27
+Medium: 23
+Unknown: 4
+```
+
 - секретов (Secret Detection)?
+```
+
+```
 
 3\. Какая уязвимость найдена в самом приложении?
+```
+Уязвимость: SQL Injection (CWE-89)
+```
+
 4\. Сколько зависимостей в приложении?
+```
+710 зависимостей, согласно отчету Dependency list
+```
+
 5\. Сколько различного рода лицензий используется в приложении и его зависимостях?
+
+
+```
+8 лицензий 
+Apache-2.0
+BSD-2-Clause
+BSD-3-Clause
+CC0-1.0
+CC-BY-3.0
+ISC
+MIT
+Unlicense
+
+```
 
 ### Решение задания
 
